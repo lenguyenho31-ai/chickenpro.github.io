@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bảng Xếp Hạng</title>
+</head>
+<body>
+  <h2>🏆 Bảng Xếp Hạng Chicken Clicker</h2>
+  <p>Người chơi đứng đầu: <span id="leaderName"></span></p>
+  <p>Điểm cao nhất: <span id="highScore"></span></p>
+
+  <script>
+    const leaderName = localStorage.getItem("leaderName") || "Chưa có ai";
+    const highScore = localStorage.getItem("highScore") || 0;
+    document.getElementById("leaderName").textContent = leaderName;
+    document.getElementById("highScore").textContent = highScore;
+  </script>
+
+  <p><a href="index.html">⬅️ Quay lại Trang chủ</a></p>
+</body>
+</html>
