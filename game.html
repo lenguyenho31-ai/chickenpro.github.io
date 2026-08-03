@@ -9,13 +9,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh; /* full màn hình */
+      height: 100vh;
       background: #f0f0f0;
     }
     #game {
       position: relative;
-      width: 200%;
-      height: 150%;
+      width: 100%;
+      height: 100%;
       border: 2px solid #ccc;
       overflow: hidden;
       text-align: center;
@@ -24,15 +24,20 @@
       margin: 10px;
       font-size: 20px;
     }
-    #duck {
+    #duck, #fakeDuck {
       position: absolute;
       cursor: pointer;
-      font-size: 150px; /* vịt to rõ */
       transition: transform 0.2s, filter 0.2s;
     }
     #duck.clicked {
       transform: scale(1.3) rotate(10deg);
       filter: brightness(1.3);
+    }
+    #fakeDuck {
+      font-size: 120px;
+      opacity: 0.4;
+      color: gray;
+      display: none; /* chỉ hiện ở chế độ siêu nhân */
     }
     #winMessage {
       display:none;
@@ -62,11 +67,11 @@
       Điểm: <span id="score">0</span> | Màn: <span id="level">1</span>
     </div>
     <span id="duck" onclick="clickDuck()">🦆</span>
+    <span id="fakeDuck">🦆</span>
   </div>
 
   <!-- Âm thanh click -->
   <audio id="duckSound" src="chicken_1.mp3"></audio>
-
   <!-- Nhạc nền -->
   <audio id="bgMusic" src="steves-lava-chicken.mp3" loop></audio>
 
@@ -80,18 +85,57 @@
     let score = 0;
     let level = 1;
     const maxLevel = 10;
+    let difficulty = "easy";
+    let isPaused = false;
+
     const duck = document.getElementById("duck");
+    const fakeDuck = document.getElementById("fakeDuck");
     const gameArea = document.getElementById("game");
 
+    function getDuckLifetime() {
+      if (difficulty === "easy") return 2000;   // 2 giây
+      if (difficulty === "hard") return 1000;   // 1 giây
+      if (difficulty === "super") return 500;   // 0.5 giây
+    }
+
     function randomPosition() {
+      if (isPaused) return;
       const maxX = gameArea.clientWidth - 150;
       const maxY = gameArea.clientHeight - 150;
       const x = Math.floor(Math.random() * maxX);
       const y = Math.floor(Math.random() * maxY);
       duck.style.left = x + "px";
       duck.style.top = y + "px";
+
+      setTimeout(() => {
+        if (!isPaused) {
+          const newX = Math.floor(Math.random() * maxX);
+          const newY = Math.floor(Math.random() * maxY);
+          duck.style.left = newX + "px";
+          duck.style.top = newY + "px";
+        }
+      }, getDuckLifetime());
     }
     randomPosition();
+
+    function randomFakePosition() {
+      if (isPaused) return;
+      const maxX = gameArea.clientWidth - 120;
+      const maxY = gameArea.clientHeight - 120;
+      const x = Math.floor(Math.random() * maxX);
+      const y = Math.floor(Math.random() * maxY);
+      fakeDuck.style.left = x + "px";
+      fakeDuck.style.top = y + "px";
+
+      setTimeout(() => {
+        if (!isPaused) {
+          const newX = Math.floor(Math.random() * maxX);
+          const newY = Math.floor(Math.random() * maxY);
+          fakeDuck.style.left = newX + "px";
+          fakeDuck.style.top = newY + "px";
+        }
+      }, 500);
+    }
 
     function showWinMessage() {
       const msg = document.getElementById("winMessage");
@@ -101,7 +145,40 @@
       }, 3000);
     }
 
+    function applyDifficulty() {
+      if (difficulty === "easy") {
+        duck.style.fontSize = "150px";
+        duck.style.color = "black";
+        fakeDuck.style.display = "none";
+      } else if (difficulty === "hard") {
+        duck.style.fontSize = "100px";
+        duck.style.color = "black";
+        fakeDuck.style.display = "none";
+      } else if (difficulty === "super") {
+        duck.style.fontSize = "80px";
+        duck.style.color = "red";
+        fakeDuck.style.display = "block";
+        randomFakePosition();
+      }
+    }
+
+    function nextLevel() {
+      level++;
+      document.getElementById("level").textContent = level;
+
+      if (level <= 4) {
+        difficulty = "easy";
+      } else if (level <= 7) {
+        difficulty = "hard";
+      } else {
+        difficulty = "super";
+      }
+      applyDifficulty();
+    }
+
     function clickDuck() {
+      if (isPaused) return;
+
       score++;
       document.getElementById("score").textContent = score;
 
@@ -117,16 +194,21 @@
       let goal = 10 * Math.pow(2, level - 1);
       if (score >= goal) {
         showWinMessage();
-        if (level < maxLevel) {
-          level++;
-          document.getElementById("level").textContent = level;
-        } else {
-          alert("🏆 Chúc mừng! Bạn đã hoàn thành tất cả 10 màn!");
-          score = 0;
-          level = 1;
-          document.getElementById("score").textContent = score;
-          document.getElementById("level").textContent = level;
-        }
+        isPaused = true; // dừng game
+        setTimeout(() => {
+          isPaused = false; // sau 10 giây thì tiếp tục
+          if (level < maxLevel) {
+            nextLevel();
+          } else {
+            alert("🏆 Chúc mừng! Bạn đã hoàn thành tất cả 10 màn!");
+            score = 0;
+            level = 1;
+            document.getElementById("score").textContent = score;
+            document.getElementById("level").textContent = level;
+            difficulty = "easy";
+            applyDifficulty();
+          }
+        }, 10000); // 10 giây pause
       }
 
       let highScore = localStorage.getItem("highScore") || 0;
@@ -135,6 +217,16 @@
         localStorage.setItem("leaderName", "Pery");
       }
     }
+
+    fakeDuck.onclick = function() {
+      if (isPaused) return;
+      if (difficulty === "super") {
+        score -= 2;
+        if (score < 0) score = 0;
+        document.getElementById("score").textContent = score;
+        randomFakePosition();
+      }
+    };
 
     window.addEventListener("click", function() {
       const bg = document.getElementById("bgMusic");
