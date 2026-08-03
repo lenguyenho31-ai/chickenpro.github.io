@@ -85,111 +85,106 @@
   </div>
 
   <script>
-    let score = 0;
-    let level = 1;
-    const maxLevel = 10;
-    let difficulty = "easy";
-    let isPaused = false;
+  let score = 0;
+  let level = 1;
+  const maxLevel = 10;
+  let difficulty = "easy";
+  let isPaused = false;
 
-    const duck = document.getElementById("duck");
-    const fakeDuck = document.getElementById("fakeDuck");
-    const gameArea = document.getElementById("game");
+  const duck = document.getElementById("duck");
+  const fakeDuck = document.getElementById("fakeDuck");
+  const gameArea = document.getElementById("game");
 
-    function getDuckLifetime() {
-      if (difficulty === "easy") return 2000;
-      if (difficulty === "hard") return 1000;
-      if (difficulty === "super") return 500;
+  // thêm biến cho vịt tấn công
+  let duckType = "normal"; // "normal" hoặc "attack"
+  let duckHealth = 1;
+  let playerHealth = 3;
+  let attackTimer;
+
+  function getDuckLifetime() {
+    if (difficulty === "easy") return 2000;
+    if (difficulty === "hard") return 1000;
+    if (difficulty === "super") return 500;
+  }
+
+  function randomPosition() {
+    if (isPaused) return;
+    const maxX = gameArea.clientWidth - 150;
+    const maxY = gameArea.clientHeight - 150;
+    const x = Math.floor(Math.random() * maxX);
+    const y = Math.floor(Math.random() * maxY);
+    duck.style.left = x + "px";
+    duck.style.top = y + "px";
+  }
+
+  function randomFakePosition() {
+    if (isPaused) return;
+    const maxX = gameArea.clientWidth - 120;
+    const maxY = gameArea.clientHeight - 120;
+    const x = Math.floor(Math.random() * maxX);
+    const y = Math.floor(Math.random() * maxY);
+    fakeDuck.style.left = x + "px";
+    fakeDuck.style.top = y + "px";
+  }
+
+  setInterval(() => {
+    if (!isPaused) {
+      randomPosition();
+      if (difficulty === "super") randomFakePosition();
     }
+  }, 1000);
 
-    function randomPosition() {
-      if (isPaused) return;
-      const maxX = gameArea.clientWidth - 150;
-      const maxY = gameArea.clientHeight - 150;
-      const x = Math.floor(Math.random() * maxX);
-      const y = Math.floor(Math.random() * maxY);
-      duck.style.left = x + "px";
-      duck.style.top = y + "px";
+  function showWinMessage() {
+    const msg = document.getElementById("winMessage");
+    msg.style.display = "block";
+  }
+
+  function applyDifficulty() {
+    duck.style.fontSize = "150px";
+    if (difficulty === "easy") {
+      duck.style.color = "black";
+      fakeDuck.style.display = "none";
+    } else if (difficulty === "hard") {
+      duck.style.color = "black";
+      fakeDuck.style.display = "none";
+    } else if (difficulty === "super") {
+      duck.style.color = "red";
+      fakeDuck.style.display = "block";
     }
+  }
 
-    function randomFakePosition() {
-      if (isPaused) return;
-      const maxX = gameArea.clientWidth - 120;
-      const maxY = gameArea.clientHeight - 120;
-      const x = Math.floor(Math.random() * maxX);
-      const y = Math.floor(Math.random() * maxY);
-      fakeDuck.style.left = x + "px";
-      fakeDuck.style.top = y + "px";
-    }
+  function nextLevel() {
+    level++;
+    document.getElementById("level").textContent = level;
+    if (level <= 4) difficulty = "easy";
+    else if (level <= 7) difficulty = "hard";
+    else difficulty = "super";
+    applyDifficulty();
+  }
 
-    setInterval(() => {
-      if (!isPaused) {
-        randomPosition();
-        if (difficulty === "super") randomFakePosition();
-      }
-    }, 1000);
+  // spawn vịt thường hoặc tấn công
+  function spawnDuck() {
+    duckType = Math.random() < 0.7 ? "normal" : "attack"; // 70% thường, 30% tấn công
+    duckHealth = duckType === "attack" ? 3 : 1;
+    duck.style.color = "black";
+    duck.style.display = "block";
 
-    function showWinMessage() {
-      const msg = document.getElementById("winMessage");
-      msg.style.display = "block";
-    }
+    clearTimeout(attackTimer);
 
-    function applyDifficulty() {
-      duck.style.fontSize = "150px";
-      if (difficulty === "easy") {
-        duck.style.color = "black";
-        fakeDuck.style.display = "none";
-      } else if (difficulty === "hard") {
-        duck.style.color = "black";
-        fakeDuck.style.display = "none";
-      } else if (difficulty === "super") {
+    if (duckType === "normal") {
+      attackTimer = setTimeout(() => {
+        duck.style.display = "none";
+      }, 3000);
+    } else {
+      attackTimer = setTimeout(() => {
         duck.style.color = "red";
-        fakeDuck.style.display = "block";
-      }
-    }
-
-    function nextLevel() {
-      level++;
-      document.getElementById("level").textContent = level;
-      if (level <= 4) difficulty = "easy";
-      else if (level <= 7) difficulty = "hard";
-      else difficulty = "super";
-      applyDifficulty();
-    }
-
-    function clickDuck() {
-      if (isPaused) return;
-      score++;
-      document.getElementById("score").textContent = score;
-
-      duck.classList.add("clicked");
-      setTimeout(() => duck.classList.remove("clicked"), 300);
-
-      const sound = document.getElementById("duckSound");
-      sound.currentTime = 0;
-      sound.play();
-
-      let goal = 10 * Math.pow(2, level - 1);
-      if (score >= goal) {
-        showWinMessage();
-        isPaused = true;
-
-        let timeLeft = 10;
-        const countdownEl = document.getElementById("countdown");
-        countdownEl.textContent = `⏳ Tiếp tục sau ${timeLeft} giây...`;
-
-        const timer = setInterval(() => {
-          timeLeft--;
-          countdownEl.textContent = `⏳ Tiếp tục sau ${timeLeft} giây...`;
-          if (timeLeft <= 0) {
-            clearInterval(timer);
-            countdownEl.textContent = "";
-            isPaused = false;
-            document.getElementById("winMessage").style.display = "none";
-
-            if (level < maxLevel) {
-              nextLevel();
-            } else {
-              alert("🏆 Chúc mừng! Bạn đã hoàn thành tất cả 10 màn!");
+        setTimeout(() => {
+          if (duckHealth > 0) {
+            playerHealth--;
+            alert(`Bạn bị cắn! Máu còn lại: ${playerHealth}`);
+            if (playerHealth <= 0) {
+              alert("Game Over!");
+              playerHealth = 3;
               score = 0;
               level = 1;
               document.getElementById("score").textContent = score;
@@ -198,33 +193,88 @@
               applyDifficulty();
             }
           }
-        }, 1000);
-      }
+          spawnDuck();
+        }, 2000);
+      }, 5000);
+    }
+  }
 
-      let highScore = localStorage.getItem("highScore") || 0;
-      if (score > highScore) {
-        localStorage.setItem("highScore", score);
-        localStorage.setItem("leaderName", "Pery");
-      }
+  function clickDuck() {
+    if (isPaused) return;
+    duckHealth--;
+    if (duckHealth <= 0) {
+      score++;
+      document.getElementById("score").textContent = score;
+      spawnDuck();
     }
 
-    fakeDuck.onclick = function() {
-      if (isPaused) return;
-      if (difficulty === "super") {
-        score -= 2;
-        if (score < 0) score = 0;
-        document.getElementById("score").textContent = score;
-      }
-    };
+    duck.classList.add("clicked");
+    setTimeout(() => duck.classList.remove("clicked"), 300);
 
-    window.addEventListener("click", function() {
-      const bg = document.getElementById("bgMusic");
-      if (bg.paused) {
-        bg.volume = 0.3;
-        bg.play();
-      }
-    });
-  </script>
+    const sound = document.getElementById("duckSound");
+    sound.currentTime = 0;
+    sound.play();
+
+    let goal = 10 * Math.pow(2, level - 1);
+    if (score >= goal) {
+      showWinMessage();
+      isPaused = true;
+
+      let timeLeft = 10;
+      const countdownEl = document.getElementById("countdown");
+      countdownEl.textContent = `⏳ Tiếp tục sau ${timeLeft} giây...`;
+
+      const timer = setInterval(() => {
+        timeLeft--;
+        countdownEl.textContent = `⏳ Tiếp tục sau ${timeLeft} giây...`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          countdownEl.textContent = "";
+          isPaused = false;
+          document.getElementById("winMessage").style.display = "none";
+
+          if (level < maxLevel) {
+            nextLevel();
+          } else {
+            alert("🏆 Chúc mừng! Bạn đã hoàn thành tất cả 10 màn!");
+            score = 0;
+            level = 1;
+            document.getElementById("score").textContent = score;
+            document.getElementById("level").textContent = level;
+            difficulty = "easy";
+            applyDifficulty();
+          }
+        }
+      }, 1000);
+    }
+
+    let highScore = localStorage.getItem("highScore") || 0;
+    if (score > highScore) {
+      localStorage.setItem("highScore", score);
+      localStorage.setItem("leaderName", "Pery");
+    }
+  }
+
+  fakeDuck.onclick = function() {
+    if (isPaused) return;
+    if (difficulty === "super") {
+      score -= 2;
+      if (score < 0) score = 0;
+      document.getElementById("score").textContent = score;
+    }
+  };
+
+  window.addEventListener("click", function() {
+    const bg = document.getElementById("bgMusic");
+    if (bg.paused) {
+      bg.volume = 0.3;
+      bg.play();
+    }
+  });
+
+  // gọi spawnDuck khi bắt đầu
+  spawnDuck();
+</script>
 
   <p style="text-align:center; margin-top:20px;">
     <a href="index.html">⬅️ Quay lại Trang chủ</a> |
@@ -232,3 +282,4 @@
   </p>
 </body>
 </html>
+
