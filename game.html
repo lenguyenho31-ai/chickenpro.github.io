@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chicken Clicker</title>
+  <title>Duck Clicker</title>
   <style>
     #game {
       position: relative;
@@ -15,13 +15,13 @@
       margin: 10px;
       font-size: 20px;
     }
-    #chicken {
+    #duck {
       position: absolute;
       cursor: pointer;
+      font-size: 500px; /* chỉnh kích thước con vịt */
       transition: transform 0.2s, filter 0.2s;
-      width: 500px;
     }
-    #chicken.clicked {
+    #duck.clicked {
       transform: scale(1.3) rotate(10deg);
       filter: brightness(1.3);
     }
@@ -30,51 +30,51 @@
 <body>
   <div id="game">
     <div id="scoreBox">Điểm: <span id="score">0</span></div>
-    <img src="chicken.png" id="chicken" onclick="clickChicken()">
+    <span id="duck" onclick="clickDuck()">🦆</span>
   </div>
 
   <!-- Âm thanh click -->
-  <audio id="chickenSound" src="chicken_1.mp3"></audio>
+  <audio id="duckSound" src="chicken_1.mp3"></audio>
 
   <!-- Nhạc nền -->
   <audio id="bgMusic" src="steves-lava-chicken.mp3" loop></audio>
 
   <script>
     let score = 0;
-    const chickenImg = document.getElementById("chicken");
+    const duck = document.getElementById("duck");
     const gameArea = document.getElementById("game");
 
     function randomPosition() {
-      const maxX = gameArea.clientWidth - chickenImg.clientWidth;
-      const maxY = gameArea.clientHeight - chickenImg.clientHeight;
+      const maxX = gameArea.clientWidth - 120; // emoji width approx
+      const maxY = gameArea.clientHeight - 120;
       const x = Math.floor(Math.random() * maxX);
       const y = Math.floor(Math.random() * maxY);
-      chickenImg.style.left = x + "px";
-      chickenImg.style.top = y + "px";
+      duck.style.left = x + "px";
+      duck.style.top = y + "px";
     }
     randomPosition();
 
-    function clickChicken() {
+    function clickDuck() {
       score++;
       document.getElementById("score").textContent = score;
 
-      // hiệu ứng
-      chickenImg.classList.add("clicked");
-      setTimeout(() => chickenImg.classList.remove("clicked"), 300);
+      // hiệu ứng khi click
+      duck.classList.add("clicked");
+      setTimeout(() => duck.classList.remove("clicked"), 300);
 
-      // âm thanh
-      const sound = document.getElementById("chickenSound");
+      // phát âm thanh click
+      const sound = document.getElementById("duckSound");
       sound.currentTime = 0;
       sound.play();
 
-      // gà nhảy vị trí mới
+      // vịt nhảy sang vị trí mới
       randomPosition();
 
-      // cập nhật điểm cao nhất
+      // lưu điểm cao nhất
       let highScore = localStorage.getItem("highScore") || 0;
       if (score > highScore) {
         localStorage.setItem("highScore", score);
-        localStorage.setItem("leaderName", "Pery"); // tạm đặt tên người chơi
+        localStorage.setItem("leaderName", "Pery");
       }
     }
 
@@ -94,3 +94,4 @@
   </p>
 </body>
 </html>
+
