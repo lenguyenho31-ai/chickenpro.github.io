@@ -5,8 +5,8 @@
   <style>
     #game {
       position: relative;
-      width: 150%;
-      height: 800px;
+      width: 200%;
+      height: 150vh; /* full màn hình */
       border: 2px solid #ccc;
       overflow: hidden;
       text-align: center;
@@ -18,18 +18,40 @@
     #duck {
       position: absolute;
       cursor: pointer;
-      font-size: 200px; /* chỉnh kích thước con vịt */
+      font-size: 150px; /* vịt to rõ */
       transition: transform 0.2s, filter 0.2s;
     }
     #duck.clicked {
       transform: scale(1.3) rotate(10deg);
       filter: brightness(1.3);
     }
+    #winMessage {
+      display:none;
+      position:fixed;
+      top:30%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      background:#fff;
+      padding:20px;
+      border:3px solid #000;
+      text-align:center;
+      z-index:999;
+    }
+    #winMessage h1 {
+      color:red;
+      font-size:40px;
+      margin-bottom:15px;
+    }
+    #winMessage img {
+      max-width:400px;
+    }
   </style>
 </head>
 <body>
   <div id="game">
-    <div id="scoreBox">Điểm: <span id="score">0</span></div>
+    <div id="scoreBox">
+      Điểm: <span id="score">0</span> | Màn: <span id="level">1</span>
+    </div>
     <span id="duck" onclick="clickDuck()">🦆</span>
   </div>
 
@@ -39,14 +61,22 @@
   <!-- Nhạc nền -->
   <audio id="bgMusic" src="steves-lava-chicken.mp3" loop></audio>
 
+  <!-- Popup YOU WON -->
+  <div id="winMessage">
+    <h1>🎉 YOU WON! 🎉</h1>
+    <img src="gangster-chickens.webp" alt="You Won Image">
+  </div>
+
   <script>
     let score = 0;
+    let level = 1;
+    const maxLevel = 10;
     const duck = document.getElementById("duck");
     const gameArea = document.getElementById("game");
 
     function randomPosition() {
-      const maxX = gameArea.clientWidth - 120; // emoji width approx
-      const maxY = gameArea.clientHeight - 120;
+      const maxX = gameArea.clientWidth - 150;
+      const maxY = gameArea.clientHeight - 150;
       const x = Math.floor(Math.random() * maxX);
       const y = Math.floor(Math.random() * maxY);
       duck.style.left = x + "px";
@@ -54,21 +84,46 @@
     }
     randomPosition();
 
+    function showWinMessage() {
+      const msg = document.getElementById("winMessage");
+      msg.style.display = "block";
+      setTimeout(() => {
+        msg.style.display = "none";
+      }, 3000); // hiện 3 giây rồi ẩn
+    }
+
     function clickDuck() {
       score++;
       document.getElementById("score").textContent = score;
 
-      // hiệu ứng khi click
+      // hiệu ứng click
       duck.classList.add("clicked");
       setTimeout(() => duck.classList.remove("clicked"), 300);
 
-      // phát âm thanh click
+      // âm thanh
       const sound = document.getElementById("duckSound");
       sound.currentTime = 0;
       sound.play();
 
-      // vịt nhảy sang vị trí mới
+      // vịt nhảy vị trí mới
       randomPosition();
+
+      // kiểm tra qua màn
+      let goal = 10 * Math.pow(2, level - 1);
+      if (score >= goal) {
+        showWinMessage();
+        if (level < maxLevel) {
+          level++;
+          document.getElementById("level").textContent = level;
+        } else {
+          alert("🏆 Chúc mừng! Bạn đã hoàn thành tất cả 10 màn!");
+          // reset game
+          score = 0;
+          level = 1;
+          document.getElementById("score").textContent = score;
+          document.getElementById("level").textContent = level;
+        }
+      }
 
       // lưu điểm cao nhất
       let highScore = localStorage.getItem("highScore") || 0;
@@ -94,4 +149,154 @@
   </p>
 </body>
 </html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Duck Clicker</title>
+  <style>
+    #game {
+      position: relative;
+      width: 100%;
+      height: 100vh; /* full màn hình */
+      border: 2px solid #ccc;
+      overflow: hidden;
+      text-align: center;
+    }
+    #scoreBox {
+      margin: 10px;
+      font-size: 20px;
+    }
+    #duck {
+      position: absolute;
+      cursor: pointer;
+      font-size: 150px; /* vịt to rõ */
+      transition: transform 0.2s, filter 0.2s;
+    }
+    #duck.clicked {
+      transform: scale(1.3) rotate(10deg);
+      filter: brightness(1.3);
+    }
+    #winMessage {
+      display:none;
+      position:fixed;
+      top:30%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      background:#fff;
+      padding:20px;
+      border:3px solid #000;
+      text-align:center;
+      z-index:999;
+    }
+    #winMessage h1 {
+      color:red;
+      font-size:40px;
+      margin-bottom:15px;
+    }
+    #winMessage img {
+      max-width:400px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="scoreBox">
+      Điểm: <span id="score">0</span> | Màn: <span id="level">1</span>
+    </div>
+    <span id="duck" onclick="clickDuck()">🦆</span>
+  </div>
 
+  <!-- Âm thanh click -->
+  <audio id="duckSound" src="chicken_1.mp3"></audio>
+
+  <!-- Nhạc nền -->
+  <audio id="bgMusic" src="steves-lava-chicken.mp3" loop></audio>
+
+  <!-- Popup YOU WON -->
+  <div id="winMessage">
+    <h1>🎉 YOU WON! 🎉</h1>
+    <img src="gangster-chickens.webp" alt="You Won Image">
+  </div>
+
+  <script>
+    let score = 0;
+    let level = 1;
+    const maxLevel = 10;
+    const duck = document.getElementById("duck");
+    const gameArea = document.getElementById("game");
+
+    function randomPosition() {
+      const maxX = gameArea.clientWidth - 150;
+      const maxY = gameArea.clientHeight - 150;
+      const x = Math.floor(Math.random() * maxX);
+      const y = Math.floor(Math.random() * maxY);
+      duck.style.left = x + "px";
+      duck.style.top = y + "px";
+    }
+    randomPosition();
+
+    function showWinMessage() {
+      const msg = document.getElementById("winMessage");
+      msg.style.display = "block";
+      setTimeout(() => {
+        msg.style.display = "none";
+      }, 3000); // hiện 3 giây rồi ẩn
+    }
+
+    function clickDuck() {
+      score++;
+      document.getElementById("score").textContent = score;
+
+      // hiệu ứng click
+      duck.classList.add("clicked");
+      setTimeout(() => duck.classList.remove("clicked"), 300);
+
+      // âm thanh
+      const sound = document.getElementById("duckSound");
+      sound.currentTime = 0;
+      sound.play();
+
+      // vịt nhảy vị trí mới
+      randomPosition();
+
+      // kiểm tra qua màn
+      let goal = 10 * Math.pow(2, level - 1);
+      if (score >= goal) {
+        showWinMessage();
+        if (level < maxLevel) {
+          level++;
+          document.getElementById("level").textContent = level;
+        } else {
+          alert("🏆 Chúc mừng! Bạn đã hoàn thành tất cả 10 màn!");
+          // reset game
+          score = 0;
+          level = 1;
+          document.getElementById("score").textContent = score;
+          document.getElementById("level").textContent = level;
+        }
+      }
+
+      // lưu điểm cao nhất
+      let highScore = localStorage.getItem("highScore") || 0;
+      if (score > highScore) {
+        localStorage.setItem("highScore", score);
+        localStorage.setItem("leaderName", "Pery");
+      }
+    }
+
+    // phát nhạc nền khi người chơi click lần đầu
+    window.addEventListener("click", function() {
+      const bg = document.getElementById("bgMusic");
+      if (bg.paused) {
+        bg.volume = 0.3;
+        bg.play();
+      }
+    });
+  </script>
+
+  <p style="text-align:center; margin-top:20px;">
+    <a href="index.html">⬅️ Quay lại Trang chủ</a> |
+    <a href="leaderboard.html">🏆 Xem Bảng Xếp Hạng</a>
+  </p>
+</body>
+</html>
