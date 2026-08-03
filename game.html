@@ -14,8 +14,8 @@
     }
     #game {
       position: relative;
-      width: 200%;
-      height: 150%;
+      width: 100%;
+      height: 100%;
       border: 2px solid #ccc;
       overflow: hidden;
       text-align: center;
@@ -28,7 +28,6 @@
       position: absolute;
       cursor: pointer;
       transition: transform 0.2s, filter 0.2s;
-      /* bỏ font-size mặc định để JS điều khiển */
     }
     #duck.clicked {
       transform: scale(1.3) rotate(10deg);
@@ -78,7 +77,6 @@
   <!-- Popup YOU WON -->
   <div id="winMessage">
     <h1>🎉 YOU WON! 🎉</h1>
-    <!-- Ảnh IMG_4914.webp đã nhúng Base64 -->
     <img src="data:image/webp;base64,UklGRsZVAQBXRUJQVlA4WAoAAAAgAAAA3wIA3wIASUNDUEgMAA...CHUOI_BASE64_DAI..." alt="You Won Image">
   </div>
 
@@ -184,4 +182,61 @@
       document.getElementById("score").textContent = score;
 
       duck.classList.add("clicked");
+      setTimeout(() => duck.classList.remove("clicked"), 300);
+
+      const sound = document.getElementById("duckSound");
+      sound.currentTime = 0;
+      sound.play();
+
+      randomPosition();
+
+      let goal = 10 * Math.pow(2, level - 1);
+      if (score >= goal) {
+        showWinMessage();
+        isPaused = true; // dừng game
+        setTimeout(() => {
+          isPaused = false; // sau 10 giây thì tiếp tục
+          if (level < maxLevel) {
+            nextLevel();
+          } else {
+            alert("🏆 Chúc mừng! Bạn đã hoàn thành tất cả 10 màn!");
+            score = 0;
+            level = 1;
+            document.getElementById("score").textContent = score;
+            document.getElementById("level").textContent = level;
+            difficulty = "easy";
+            applyDifficulty();
+          }
+        }, 10000); // 10 giây pause
+      }
+
+      let highScore = localStorage.getItem("highScore") || 0;
+      if (score > highScore) {
+        localStorage.setItem("highScore", score);
+        localStorage.setItem("leaderName", "Pery");
+      }
+    }
+
+    fakeDuck.onclick = function() {
+      if (isPaused) return;
+      if (difficulty === "super") {
+        score -= 2;
+        if (score < 0) score = 0;
+        document.getElementById("score").textContent = score;
+        randomFakePosition();
+      }
+    };
+
+    window.addEventListener("click", function() {
+      const bg = document.getElementById("bgMusic");
+      if (bg.paused) {
+        bg.volume = 0.3;
+        bg.play();
+      }
+    });
+  </script>
+
+  <p style="text-align:center; margin-top:20px;">
+    <a href="index.html">⬅️ Quay lại Trang chủ</a> |
+    <a href="
 
