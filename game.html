@@ -14,8 +14,8 @@
     }
     #game {
       position: relative;
-      width: 100%;
-      height: 100%;
+      width: 200%;
+      height: 150%;
       border: 2px solid #ccc;
       overflow: hidden;
       text-align: center;
@@ -37,7 +37,7 @@
     #fakeDuck {
       opacity: 0.4;
       color: gray;
-      display: none; /* chỉ hiện ở chế độ siêu nhân */
+      display: none;
     }
     #winMessage {
       display:none;
@@ -59,6 +59,11 @@
     #winMessage img {
       max-width:400px;
     }
+    #countdown {
+      font-size: 24px;
+      color: blue;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -70,15 +75,13 @@
     <span id="fakeDuck">🦆</span>
   </div>
 
-  <!-- Âm thanh click -->
   <audio id="duckSound" src="chicken_1.mp3"></audio>
-  <!-- Nhạc nền -->
   <audio id="bgMusic" src="steves-lava-chicken.mp3" loop></audio>
 
-  <!-- Popup YOU WON -->
   <div id="winMessage">
     <h1>🎉 YOU WON! 🎉</h1>
     <img src="data:image/webp;base64,UklGRsZVAQBXRUJQVlA4WAoAAAAgAAAA3wIA3wIASUNDUEgMAA...CHUOI_BASE64_DAI..." alt="You Won Image">
+    <p id="countdown"></p>
   </div>
 
   <script>
@@ -93,9 +96,9 @@
     const gameArea = document.getElementById("game");
 
     function getDuckLifetime() {
-      if (difficulty === "easy") return 2000;   // 2 giây
-      if (difficulty === "hard") return 1000;   // 1 giây
-      if (difficulty === "super") return 500;   // 0.5 giây
+      if (difficulty === "easy") return 2000;
+      if (difficulty === "hard") return 1000;
+      if (difficulty === "super") return 500;
     }
 
     function randomPosition() {
@@ -106,17 +109,7 @@
       const y = Math.floor(Math.random() * maxY);
       duck.style.left = x + "px";
       duck.style.top = y + "px";
-
-      setTimeout(() => {
-        if (!isPaused) {
-          const newX = Math.floor(Math.random() * maxX);
-          const newY = Math.floor(Math.random() * maxY);
-          duck.style.left = newX + "px";
-          duck.style.top = newY + "px";
-        }
-      }, getDuckLifetime());
     }
-    randomPosition();
 
     function randomFakePosition() {
       if (isPaused) return;
@@ -126,27 +119,22 @@
       const y = Math.floor(Math.random() * maxY);
       fakeDuck.style.left = x + "px";
       fakeDuck.style.top = y + "px";
-
-      setTimeout(() => {
-        if (!isPaused) {
-          const newX = Math.floor(Math.random() * maxX);
-          const newY = Math.floor(Math.random() * maxY);
-          fakeDuck.style.left = newX + "px";
-          fakeDuck.style.top = newY + "px";
-        }
-      }, 500);
     }
+
+    setInterval(() => {
+      if (!isPaused) {
+        randomPosition();
+        if (difficulty === "super") randomFakePosition();
+      }
+    }, 1000);
 
     function showWinMessage() {
       const msg = document.getElementById("winMessage");
       msg.style.display = "block";
-      setTimeout(() => {
-        msg.style.display = "none";
-      }, 3000);
     }
 
     function applyDifficulty() {
-      duck.style.fontSize = "150px"; // luôn to mặc định
+      duck.style.fontSize = "150px";
       if (difficulty === "easy") {
         duck.style.color = "black";
         fakeDuck.style.display = "none";
@@ -156,27 +144,20 @@
       } else if (difficulty === "super") {
         duck.style.color = "red";
         fakeDuck.style.display = "block";
-        randomFakePosition();
       }
     }
 
     function nextLevel() {
       level++;
       document.getElementById("level").textContent = level;
-
-      if (level <= 4) {
-        difficulty = "easy";
-      } else if (level <= 7) {
-        difficulty = "hard";
-      } else {
-        difficulty = "super";
-      }
+      if (level <= 4) difficulty = "easy";
+      else if (level <= 7) difficulty = "hard";
+      else difficulty = "super";
       applyDifficulty();
     }
 
     function clickDuck() {
       if (isPaused) return;
-
       score++;
       document.getElementById("score").textContent = score;
 
@@ -187,26 +168,37 @@
       sound.currentTime = 0;
       sound.play();
 
-      randomPosition();
-
       let goal = 10 * Math.pow(2, level - 1);
       if (score >= goal) {
         showWinMessage();
-        isPaused = true; // dừng game
-        setTimeout(() => {
-          isPaused = false; // sau 10 giây thì tiếp tục
-          if (level < maxLevel) {
-            nextLevel();
-          } else {
-            alert("🏆 Chúc mừng! Bạn đã hoàn thành tất cả 10 màn!");
-            score = 0;
-            level = 1;
-            document.getElementById("score").textContent = score;
-            document.getElementById("level").textContent = level;
-            difficulty = "easy";
-            applyDifficulty();
+        isPaused = true;
+
+        let timeLeft = 10;
+        const countdownEl = document.getElementById("countdown");
+        countdownEl.textContent = `⏳ Tiếp tục sau ${timeLeft} giây...`;
+
+        const timer = setInterval(() => {
+          timeLeft--;
+          countdownEl.textContent = `⏳ Tiếp tục sau ${timeLeft} giây...`;
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            countdownEl.textContent = "";
+            isPaused = false;
+            document.getElementById("winMessage").style.display = "none";
+
+            if (level < maxLevel) {
+              nextLevel();
+            } else {
+              alert("🏆 Chúc mừng! Bạn đã hoàn thành tất cả 10 màn!");
+              score = 0;
+              level = 1;
+              document.getElementById("score").textContent = score;
+              document.getElementById("level").textContent = level;
+              difficulty = "easy";
+              applyDifficulty();
+            }
           }
-        }, 10000); // 10 giây pause
+        }, 1000);
       }
 
       let highScore = localStorage.getItem("highScore") || 0;
@@ -222,7 +214,6 @@
         score -= 2;
         if (score < 0) score = 0;
         document.getElementById("score").textContent = score;
-        randomFakePosition();
       }
     };
 
