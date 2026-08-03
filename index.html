@@ -3,60 +3,15 @@
 <head>
   <title>Chicken Gang Website</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    #game {
-      text-align: center;
-      margin-top: 50px;
-    }
-    #chicken {
-      cursor: pointer;
-      transition: transform 0.1s;
-    }
-    #chicken:active {
-      transform: scale(1.2);
-    }
-  </style>
 </head>
 <body>
-  <!-- Trò chơi Chicken Clicker -->
-  <div id="game">
-    <h2>🐔 Chicken Clicker</h2>
-    <p>Điểm: <span id="score">0</span></p>
-    <img src="chicken.png" id="chicken" width="150" onclick="clickChicken()">
-  </div>
-
-  <!-- Âm thanh click -->
-  <audio id="chickenSound" src="chicken_1.mp3"></audio>
-
-  <!-- Nhạc nền -->
-  <audio id="bgMusic" src="steve-lava-chicken.mp3" loop></audio>
-
-  <script>
-    let score = 0;
-    function clickChicken() {
-      score++;
-      document.getElementById("score").textContent = score;
-      const sound = document.getElementById("chickenSound");
-      sound.currentTime = 0; // reset để phát lại từ đầu
-      sound.play();
-    }
-
-    // Phát nhạc nền khi người chơi bắt đầu
-    window.addEventListener("click", function() {
-      const bg = document.getElementById("bgMusic");
-      if (bg.paused) {
-        bg.volume = 0.3; // âm lượng 30%
-        bg.play();
-      }
-    });
-  </script>
-
   <!-- Header -->
   <header>
     <h1>🐔 Chào Mừng Đến Với Chicken Gang</h1>
     <nav>
       <a href="index.html">Trang chủ</a>
       <a href="about.html">Giới thiệu</a>
+      <a href="game.html">🎮 Chơi Chicken Clicker</a>
     </nav>
   </header>
 
@@ -70,4 +25,28 @@
     <script>
       function sayWelcome() {
         alert("Welcome to Chicken Gang!");
-        const sound = document
+        // phát âm thanh chào mừng
+        const sound = document.getElementById("welcomeSound");
+        sound.play();
+      }   
+    </script>
+
+    <!-- Âm thanh chào mừng -->
+    <audio id="welcomeSound" src="chicken-scream.mp3"></audio>
+
+    <!-- Khung chat Discord -->
+    <iframe src="https://discord.com/widget?id=1533513989777002577&theme=dark"
+      width="100%" height="600"
+      allowtransparency="true"
+      frameborder="0"
+      sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
+    </iframe>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Chicken Gang</p>
+  </footer>
+</body>
+</html>
+
