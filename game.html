@@ -20,6 +20,7 @@
   <div id="game">
     <h2>🐔 Chicken Clicker</h2>
     <p>Điểm: <span id="score">0</span></p>
+    <!-- Hình gà mặc định -->
     <img src="chicken.png" id="chicken" width="150" onclick="clickChicken()">
   </div>
 
@@ -31,15 +32,27 @@
 
   <script>
     let score = 0;
+    let chickenImg = document.getElementById("chicken");
+
     function clickChicken() {
       score++;
       document.getElementById("score").textContent = score;
+
+      // đổi hình sang sticker khi click
+      chickenImg.src = "chicken-sticker.png"; 
+
+      // sau 300ms đổi lại hình gốc
+      setTimeout(() => {
+        chickenImg.src = "chicken.png";
+      }, 300);
+
+      // phát âm thanh click
       const sound = document.getElementById("chickenSound");
-      sound.currentTime = 0;
+      sound.currentTime = 0; 
       sound.play();
     }
 
-    // Phát nhạc nền khi người chơi click lần đầu
+    // phát nhạc nền khi người chơi click lần đầu
     window.addEventListener("click", function() {
       const bg = document.getElementById("bgMusic");
       if (bg.paused) {
