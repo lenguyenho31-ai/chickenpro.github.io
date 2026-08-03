@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chicken Clicker</title>
+  <title>Chicken Gang Website</title>
+  <link rel="stylesheet" href="style.css">
   <style>
     #game {
       text-align: center;
@@ -15,9 +16,9 @@
       transform: scale(1.2);
     }
   </style>
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Trò chơi Chicken Clicker -->
   <div id="game">
     <h2>🐔 Chicken Clicker</h2>
     <p>Điểm: <span id="score">0</span></p>
@@ -28,7 +29,7 @@
   <audio id="chickenSound" src="chicken_1.mp3"></audio>
 
   <!-- Nhạc nền -->
-  <audio id="bgMusic" src="steve-lava-chicken.mp3" autoplay loop></audio>
+  <audio id="bgMusic" src="steve-lava-chicken.mp3" loop></audio>
 
   <script>
     let score = 0;
@@ -40,11 +41,17 @@
       sound.play();
     }
 
-    // Tùy chỉnh nhạc nền (tăng-giảm âm lượng)
-    const bg = document.getElementById("bgMusic");
-    bg.volume = 0.3; // âm lượng 30%
+    // Phát nhạc nền khi người chơi bắt đầu
+    window.addEventListener("click", function() {
+      const bg = document.getElementById("bgMusic");
+      if (bg.paused) {
+        bg.volume = 0.3; // âm lượng 30%
+        bg.play();
+      }
+    });
   </script>
 
+  <!-- Header -->
   <header>
     <h1>🐔 Chào Mừng Đến Với Chicken Gang</h1>
     <nav>
@@ -53,31 +60,14 @@
     </nav>
   </header>
 
+  <!-- Nội dung chính -->
   <main>
     <p>Website được host miễn phí bằng GitHub Pages.</p>
 
-    <!-- Nút bấm -->
+    <!-- Nút chào mừng -->
     <button onclick="sayWelcome()">Bấm thử</button>
 
     <script>
       function sayWelcome() {
         alert("Welcome to Chicken Gang!");
-        const sound = document.getElementById("chickenSound");
-        sound.play();
-      }   
-    </script>
-
-    <!-- Khung chat Discord -->
-    <iframe src="https://discord.com/widget?id=1533513989777002577&theme=dark"
-      width="100%" height="600"
-      allowtransparency="true"
-      frameborder="0"
-      sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
-    </iframe>
-  </main>
-
-  <footer>
-    <p>&copy; 2026 Chicken Gang</p>
-  </footer>
-</body>
-</html>
+        const sound = document
