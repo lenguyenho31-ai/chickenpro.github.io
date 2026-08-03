@@ -1,20 +1,76 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html>
 <head>
-  <title>Bảng Xếp Hạng</title>
+  <script>
+  // Hàm lưu điểm vào localStorage
+  function saveGame(playerName, score) {
+    let scores = JSON.parse(localStorage.getItem("scores")) || [];
+    scores.push({ name: playerName, score: score });
+    localStorage.setItem("scores", JSON.stringify(scores));
+    alert("Game đã được lưu cho " + playerName + " với điểm: " + score);
+  }
+
+  // Ví dụ: gọi hàm khi người chơi kết thúc
+  // Bạn có thể thay playerName bằng input từ người chơi
+  // và score là biến điểm trong game
+  // saveGame("Pery", 25);
+</script>
+  <title>🏆 Leaderboard Top 10</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+      text-align: center;
+    }
+    h1 {
+      color: #d32f2f;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 70%;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    th {
+      background: #ffeb3b;
+    }
+  </style>
 </head>
 <body>
-  <h2>🏆 Bảng Xếp Hạng Chicken Clicker</h2>
-  <p>Người chơi đứng đầu: <span id="leaderName"></span></p>
-  <p>Điểm cao nhất: <span id="highScore"></span></p>
+  <h1>🏆 Bảng Xếp Hạng Top 10</h1>
+  <table id="leaderboard">
+    <tr>
+      <th>Thứ hạng</th>
+      <th>Tên</th>
+      <th>Điểm</th>
+    </tr>
+  </table>
 
   <script>
-    const leaderName = localStorage.getItem("leaderName") || "Chưa có ai";
-    const highScore = localStorage.getItem("highScore") || 0;
-    document.getElementById("leaderName").textContent = leaderName;
-    document.getElementById("highScore").textContent = highScore;
-  </script>
+    // Lấy dữ liệu từ localStorage
+    let scores = JSON.parse(localStorage.getItem("scores")) || [];
 
-  <p><a href="index.html">⬅️ Quay lại Trang chủ</a></p>
+    // Sắp xếp giảm dần theo điểm
+    scores.sort((a, b) => b.score - a.score);
+
+    // Chỉ lấy top 10
+    scores = scores.slice(0, 10);
+
+    // Hiển thị lên bảng
+    const table = document.getElementById("leaderboard");
+    scores.forEach((entry, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${entry.name}</td>
+        <td>${entry.score}</td>
+      `;
+      table.appendChild(row);
+    });
+  </script>
 </body>
 </html>
