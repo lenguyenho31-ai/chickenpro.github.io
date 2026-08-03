@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chicken Clicker</title>
+  <style>
+    #game {
+      text-align: center;
+      margin-top: 50px;
+    }
+    #chicken {
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    #chicken:active {
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <h2>🐔 Chicken Clicker</h2>
+    <p>Điểm: <span id="score">0</span></p>
+    <img src="chicken.png" id="chicken" width="150" onclick="clickChicken()">
+  </div>
+
+  <!-- Âm thanh click -->
+  <audio id="chickenSound" src="chicken_1.mp3"></audio>
+
+  <!-- Nhạc nền -->
+  <audio id="bgMusic" src="steve-lava-chicken.mp3" loop></audio>
+
+  <script>
+    let score = 0;
+    function clickChicken() {
+      score++;
+      document.getElementById("score").textContent = score;
+      const sound = document.getElementById("chickenSound");
+      sound.currentTime = 0;
+      sound.play();
+    }
+
+    // Phát nhạc nền khi người chơi click lần đầu
+    window.addEventListener("click", function() {
+      const bg = document.getElementById("bgMusic");
+      if (bg.paused) {
+        bg.volume = 0.3;
+        bg.play();
+      }
+    });
+  </script>
+</body>
+</html>
