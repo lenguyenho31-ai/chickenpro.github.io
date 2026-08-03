@@ -274,6 +274,19 @@
 
   // gọi spawnDuck khi bắt đầu
   spawnDuck();
+    // Vô hiệu hóa chuột phải trong khu vực game
+gameArea.addEventListener("contextmenu", function(e) {
+  e.preventDefault(); // chặn menu chuột phải
+});
+
+// Chỉ cho phép click chuột trái khi chơi
+duck.addEventListener("mousedown", function(e) {
+  if (e.button !== 0) { // 0 = chuột trái
+    e.preventDefault();
+    return;
+  }
+  clickDuck(); // gọi hàm bắn vịt
+});
 </script>
 
   <p style="text-align:center; margin-top:20px;">
