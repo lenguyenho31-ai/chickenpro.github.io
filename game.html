@@ -56,7 +56,7 @@
   <div id="scoreboard">Điểm: 0</div>
   <canvas id="gameCanvas" width="800" height="500"></canvas>
 
-  <!-- Các nút điều hướng mở tab riêng -->
+  <!-- Các nút điều hướng -->
   <button onclick="saveGame()">💾 Lưu điểm</button>
   <button onclick="window.open('leaderboard.html','_blank')">🏆 Xem Bảng Xếp Hạng</button>
   <button onclick="window.open('index.html','_blank')">⬅️ Quay lại Trang Chủ</button>
@@ -67,16 +67,17 @@
 
     let ducks = [];
     let score = 0;
+    let explosions = [];
 
-    // Tạo vịt đứng yên, tự biến mất sau 2s
+    // Tạo vịt đứng yên, tự biến mất sau 4s
     function createDuck() {
-      const y = Math.random() * (canvas.height - 50);
       const x = Math.random() * (canvas.width - 50);
+      const y = Math.random() * (canvas.height - 50);
       ducks.push({ x: x, y: y, createdAt: Date.now() });
     }
 
     function drawDuck(duck) {
-      ctx.font = "30px Arial";
+      ctx.font = "40px Segoe UI Emoji";
       ctx.fillText("🦆", duck.x, duck.y);
     }
 
@@ -88,16 +89,32 @@
       ctx.fillText("Điểm: " + score, 15, 27);
     }
 
+    // Vẽ hiệu ứng nổ khi vịt bị bắn
+    function drawExplosion(explosion) {
+      const progress = (Date.now() - explosion.start) / 500; // 0.5s
+      if (progress < 1) {
+        ctx.beginPath();
+        ctx.arc(explosion.x, explosion.y, 20 + progress * 30, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,0,0,${1 - progress})`;
+        ctx.fill();
+      } else {
+        explosions.splice(explosions.indexOf(explosion), 1);
+      }
+    }
+
     function update() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#aaffcc";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ducks.forEach((duck, index) => {
-        if (Date.now() - duck.createdAt > 2000) {
+        if (Date.now() - duck.createdAt > 4000) {
           ducks.splice(index, 1);
         } else {
           drawDuck(duck);
         }
       });
+
+      explosions.forEach(explosion => drawExplosion(explosion));
 
       drawScore();
       requestAnimationFrame(update);
@@ -114,7 +131,9 @@
           const dy = mouseY - duck.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < 20) {
+          if (distance < 25) {
+            // Tạo hiệu ứng nổ
+            explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
             ducks.splice(index, 1);
             score++;
             document.getElementById("scoreboard").textContent = "Điểm: " + score;
