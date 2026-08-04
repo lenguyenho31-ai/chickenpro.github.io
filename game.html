@@ -84,7 +84,6 @@
     let score = 0;
     let explosions = [];
 
-    // Tạo duy nhất 1 con vịt
     function createDuck() {
       const x = Math.random() * (canvas.width - 50);
       const y = Math.random() * (canvas.height - 50);
@@ -123,11 +122,14 @@
       ctx.fillStyle = "#aaffcc";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Nếu chưa có vịt thì tạo ngay
+      if (!duck) {
+        createDuck();
+      }
+
       if (duck) {
         if (Date.now() - duck.createdAt > 4000) {
-          // nếu vịt hết hạn thì tạo ngay con mới
-          duck = null;
-          createDuck();
+          duck = null; // hết hạn
         } else {
           drawDuck(duck);
         }
@@ -150,17 +152,14 @@
 
         if (distance < 30) {
           explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
-          duck = null;
+          duck = null; // xoá vịt cũ
           score++;
           document.getElementById("scoreboard").textContent = "Điểm: " + score;
-          // tạo ngay con mới sau khi bắn trúng
-          createDuck();
+          // con mới sẽ được tạo ngay trong vòng lặp update()
         }
       }
     });
 
-    // tạo con đầu tiên ngay khi load
-    createDuck();
     update();
 
     function saveGame() {
