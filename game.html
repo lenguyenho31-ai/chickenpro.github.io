@@ -26,7 +26,7 @@
     canvas {
       display: block;
       margin: auto;
-      background: #87CEEB; /* nền trời */
+      background: #87CEEB;
       border: 2px solid #333;
     }
     @keyframes bounce {
@@ -56,6 +56,8 @@
   <div id="scoreboard">Điểm: 0</div>
   <canvas id="gameCanvas" width="800" height="500"></canvas>
   <button onclick="window.location.href='index.html'">⬅️ Quay lại Trang Chủ</button>
+  <button onclick="saveGame()">💾 Lưu điểm</button>
+  <button onclick="window.location.href='leaderboard.html'">🏆 Xem Bảng Xếp Hạng</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
@@ -64,19 +66,16 @@
     let ducks = [];
     let score = 0;
 
-    // Tạo vịt bay ngẫu nhiên
     function createDuck() {
       const y = Math.random() * (canvas.height - 50);
       ducks.push({ x: 0, y: y, speed: 2 + Math.random() * 3 });
     }
 
-    // Vẽ vịt bằng emoji 🦆
     function drawDuck(duck) {
       ctx.font = "30px Arial";
       ctx.fillText("🦆", duck.x, duck.y);
     }
 
-    // Vẽ điểm số
     function drawScore() {
       ctx.fillStyle = "rgba(0,0,0,0.5)";
       ctx.fillRect(5, 5, 120, 30);
@@ -85,7 +84,6 @@
       ctx.fillText("Điểm: " + score, 15, 27);
     }
 
-    // Cập nhật game
     function update() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -101,7 +99,6 @@
       requestAnimationFrame(update);
     }
 
-    // Bắn vịt khi click chuột trái
     canvas.addEventListener("mousedown", (e) => {
       if (e.button === 0) {
         const rect = canvas.getBoundingClientRect();
@@ -122,10 +119,18 @@
       }
     });
 
-    // Tạo vịt liên tục
     setInterval(createDuck, 1500);
-
     update();
+
+    // Hàm lưu điểm vào localStorage
+    function saveGame() {
+      let playerName = prompt("Nhập tên của bạn:");
+      if (!playerName) playerName = "Người chơi";
+      let scores = JSON.parse(localStorage.getItem("scores")) || [];
+      scores.push({ name: playerName, score: score });
+      localStorage.setItem("scores", JSON.stringify(scores));
+      alert("Đã lưu điểm cho " + playerName + " với điểm: " + score);
+    }
   </script>
 </body>
 </html>
