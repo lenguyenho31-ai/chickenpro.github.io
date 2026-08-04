@@ -25,6 +25,21 @@
     th {
       background: #ffeb3b;
     }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #d32f2f;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: transform 0.3s, background-color 0.3s;
+    }
+    button:hover {
+      transform: scale(1.1);
+      background-color: #b71c1c;
+    }
   </style>
 </head>
 <body>
@@ -37,15 +52,10 @@
     </tr>
   </table>
 
-  <script>
-    // Hàm lưu điểm vào localStorage
-    function saveGame(playerName, score) {
-      let scores = JSON.parse(localStorage.getItem("scores")) || [];
-      scores.push({ name: playerName, score: score });
-      localStorage.setItem("scores", JSON.stringify(scores));
-      alert("Game đã được lưu cho " + playerName + " với điểm: " + score);
-    }
+  <!-- Nút reset -->
+  <button onclick="resetLeaderboard()">🗑️ Reset Leaderboard</button>
 
+  <script>
     // Lấy dữ liệu từ localStorage
     let scores = JSON.parse(localStorage.getItem("scores")) || [];
 
@@ -66,6 +76,20 @@
       `;
       table.appendChild(row);
     });
+
+    // Hàm reset leaderboard với mật khẩu
+    function resetLeaderboard() {
+      const password = prompt("Nhập mật khẩu để reset leaderboard:");
+      const correctPassword = "chicken123"; // 🔑 thay bằng mật khẩu thật của bạn
+
+      if (password === correctPassword) {
+        localStorage.removeItem("scores");
+        alert("Bảng xếp hạng đã được reset!");
+        location.reload();
+      } else {
+        alert("Sai mật khẩu! Không thể reset leaderboard.");
+      }
+    }
   </script>
 </body>
 </html>
