@@ -1,20 +1,7 @@
-<<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-  <script>
-  // Hàm lưu điểm vào localStorage
-  function saveGame(playerName, score) {
-    let scores = JSON.parse(localStorage.getItem("scores")) || [];
-    scores.push({ name: playerName, score: score });
-    localStorage.setItem("scores", JSON.stringify(scores));
-    alert("Game đã được lưu cho " + playerName + " với điểm: " + score);
-  }
-
-  // Ví dụ: gọi hàm khi người chơi kết thúc
-  // Bạn có thể thay playerName bằng input từ người chơi
-  // và score là biến điểm trong game
-  // saveGame("Pery", 25);
-</script>
+  <meta charset="UTF-8">
   <title>🏆 Leaderboard Top 10</title>
   <style>
     body {
@@ -51,6 +38,14 @@
   </table>
 
   <script>
+    // Hàm lưu điểm vào localStorage
+    function saveGame(playerName, score) {
+      let scores = JSON.parse(localStorage.getItem("scores")) || [];
+      scores.push({ name: playerName, score: score });
+      localStorage.setItem("scores", JSON.stringify(scores));
+      alert("Game đã được lưu cho " + playerName + " với điểm: " + score);
+    }
+
     // Lấy dữ liệu từ localStorage
     let scores = JSON.parse(localStorage.getItem("scores")) || [];
 
