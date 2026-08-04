@@ -34,30 +34,12 @@
       40% { transform: translateY(-20px); }
       60% { transform: translateY(-10px); }
     }
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      background: #ff6f61;
-      color: white;
-      font-size: 1em;
-      cursor: pointer;
-      transition: transform 0.3s, background-color 0.3s;
-      margin-top: 15px;
-    }
-    button:hover {
-      transform: scale(1.1);
-      background-color: #e85c50;
-    }
   </style>
 </head>
 <body>
   <h1>🐔 Chicken Gang - Game Bắn Vịt 🦆</h1>
   <div id="scoreboard">Điểm: 0</div>
   <canvas id="gameCanvas" width="800" height="500"></canvas>
-  <button onclick="window.location.href='index.html'">⬅️ Quay lại Trang Chủ</button>
-  <button onclick="saveGame()">💾 Lưu điểm</button>
-  <button onclick="window.location.href='leaderboard.html'">🏆 Xem Bảng Xếp Hạng</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
@@ -66,9 +48,11 @@
     let ducks = [];
     let score = 0;
 
+    // Tạo vịt đứng yên
     function createDuck() {
       const y = Math.random() * (canvas.height - 50);
-      ducks.push({ x: 0, y: y, speed: 2 + Math.random() * 3 });
+      const x = Math.random() * (canvas.width - 50);
+      ducks.push({ x: x, y: y, createdAt: Date.now() });
     }
 
     function drawDuck(duck) {
@@ -88,10 +72,11 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       ducks.forEach((duck, index) => {
-        duck.x += duck.speed;
-        drawDuck(duck);
-        if (duck.x > canvas.width) {
+        // Nếu vịt đã tồn tại quá 2 giây thì xóa
+        if (Date.now() - duck.createdAt > 2000) {
           ducks.splice(index, 1);
+        } else {
+          drawDuck(duck);
         }
       });
 
@@ -121,16 +106,6 @@
 
     setInterval(createDuck, 1500);
     update();
-
-    // Hàm lưu điểm vào localStorage
-    function saveGame() {
-      let playerName = prompt("Nhập tên của bạn:");
-      if (!playerName) playerName = "Người chơi";
-      let scores = JSON.parse(localStorage.getItem("scores")) || [];
-      scores.push({ name: playerName, score: score });
-      localStorage.setItem("scores", JSON.stringify(scores));
-      alert("Đã lưu điểm cho " + playerName + " với điểm: " + score);
-    }
   </script>
 </body>
 </html>
