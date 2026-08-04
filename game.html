@@ -5,14 +5,15 @@
   <title>Chicken Gang - Game Bắn Vịt</title>
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      text-align: center;
       margin: 0;
       padding: 0;
+      font-family: 'Roboto', sans-serif;
+      text-align: center;
       background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      overflow: hidden;
     }
     h1 {
-      margin: 20px;
+      margin: 10px;
       color: #ff6f61;
       font-family: 'Fredoka One', cursive;
       animation: bounce 2s infinite;
@@ -21,18 +22,27 @@
       font-size: 22px;
       font-weight: bold;
       color: #333;
-      margin: 10px;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.7);
+      padding: 5px 10px;
+      border-radius: 6px;
     }
     canvas {
       display: block;
-      margin: auto;
       background: #aaffcc; /* xanh neon nhạt */
-      border: 2px solid #333;
     }
     @keyframes bounce {
       0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
       40% { transform: translateY(-20px); }
       60% { transform: translateY(-10px); }
+    }
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
     }
     button {
       padding: 10px 20px;
@@ -54,15 +64,21 @@
 <body>
   <h1>🐔 Chicken Gang - Game Bắn Vịt 🦆</h1>
   <div id="scoreboard">Điểm: 0</div>
-  <canvas id="gameCanvas" width="500" height="350"></canvas>
+  <canvas id="gameCanvas"></canvas>
 
-  <button onclick="saveGame()">💾 Lưu điểm</button>
-  <button onclick="window.open('leaderboard.html','_blank')">🏆 Xem Bảng Xếp Hạng</button>
-  <button onclick="window.open('index.html','_blank')">⬅️ Quay lại Trang Chủ</button>
+  <div id="controls">
+    <button onclick="saveGame()">💾 Lưu điểm</button>
+    <button onclick="window.open('leaderboard.html','_blank')">🏆 Xem Bảng Xếp Hạng</button>
+    <button onclick="window.open('index.html','_blank')">⬅️ Quay lại Trang Chủ</button>
+  </div>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
+
+    // Canvas full màn hình
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     let duck = null;
     let score = 0;
@@ -76,8 +92,11 @@
     }
 
     function drawDuck(d) {
-      ctx.font = "40px Segoe UI Emoji";
-      ctx.fillText("🦆", d.x, d.y);
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, 20, 0, Math.PI * 2);
+      ctx.fillStyle = "yellow";
+      ctx.fill();
+      ctx.stroke();
     }
 
     function drawScore() {
@@ -106,7 +125,9 @@
 
       if (duck) {
         if (Date.now() - duck.createdAt > 4000) {
+          // nếu vịt hết hạn thì tạo ngay con mới
           duck = null;
+          createDuck();
         } else {
           drawDuck(duck);
         }
@@ -127,19 +148,19 @@
         const dy = mouseY - duck.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < 25) {
+        if (distance < 30) {
           explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
           duck = null;
           score++;
           document.getElementById("scoreboard").textContent = "Điểm: " + score;
+          // tạo ngay con mới sau khi bắn trúng
+          createDuck();
         }
       }
     });
 
-    setInterval(() => {
-      if (!duck) createDuck();
-    }, 1500);
-
+    // tạo con đầu tiên ngay khi load
+    createDuck();
     update();
 
     function saveGame() {
@@ -150,6 +171,11 @@
       localStorage.setItem("scores", JSON.stringify(scores));
       alert("Đã lưu điểm cho " + playerName + " với điểm: " + score);
     }
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
   </script>
 </body>
 </html>
