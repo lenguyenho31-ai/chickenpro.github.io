@@ -1,110 +1,65 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Chicken Gang</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-      color: #333;
+<script>
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+
+  let ducks = [];
+  let score = 0;
+
+  // Tạo vịt đứng yên, tự biến mất sau 2 giây
+  function createDuck() {
+    const x = Math.random() * (canvas.width - 50);
+    const y = Math.random() * (canvas.height - 50);
+    ducks.push({ x: x, y: y, createdAt: Date.now() });
+  }
+
+  function drawDuck(duck) {
+    ctx.font = "40px Arial";
+    ctx.fillText("🦆", duck.x, duck.y);
+  }
+
+  function drawScore() {
+    ctx.fillStyle = "rgba(0,0,0,0.5)";
+    ctx.fillRect(5, 5, 120, 30);
+    ctx.fillStyle = "white";
+    ctx.font = "20px Arial";
+    ctx.fillText("Điểm: " + score, 15, 27);
+  }
+
+  function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ducks.forEach((duck, index) => {
+      if (Date.now() - duck.createdAt > 2000) {
+        ducks.splice(index, 1);
+      } else {
+        drawDuck(duck);
+      }
+    });
+
+    drawScore();
+    requestAnimationFrame(update);
+  }
+
+  canvas.addEventListener("mousedown", (e) => {
+    if (e.button === 0) {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      ducks.forEach((duck, index) => {
+        const dx = mouseX - duck.x;
+        const dy = mouseY - duck.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 25) {
+          ducks.splice(index, 1);
+          score++;
+          document.getElementById("scoreboard").textContent = "Điểm: " + score;
+        }
+      });
     }
-    header {
-      background: #ff6f61;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    header h1 {
-      font-family: 'Fredoka One', cursive;
-      font-size: 3em;
-      margin: 0;
-      animation: bounce 2s infinite;
-    }
-    nav {
-      background: #333;
-      padding: 10px;
-      text-align: center;
-    }
-    nav a {
-      color: white;
-      margin: 0 15px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: color 0.3s, text-decoration 0.3s;
-    }
-    nav a:hover {
-      color: #ff6f61;
-      text-decoration: underline;
-    }
-    section {
-      padding: 40px;
-      text-align: center;
-    }
-    button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      background: #ff6f61;
-      color: white;
-      font-size: 1em;
-      cursor: pointer;
-      transition: transform 0.3s, background-color 0.3s;
-    }
-    button:hover {
-      transform: scale(1.1);
-      background-color: #e85c50;
-    }
-    footer {
-      background: #333;
-      color: white;
-      text-align: center;
-      padding: 15px;
-    }
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-20px); }
-      60% { transform: translateY(-10px); }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>🐔 Chicken Gang 🐔</h1>
-    <p>Nơi hội tụ những chú gà vui nhộn!</p>
-  </header>
-  <nav>
-    <a href="#about">Giới thiệu</a>
-    <a href="#gallery">Hình ảnh</a>
-    <a href="#game">Game</a>
-    <a href="#contact">Liên hệ</a>
-  </nav>
-  <section id="about">
-    <h2>Giới thiệu</h2>
-    <p>Chicken Gang là cộng đồng yêu thích gà, nơi bạn có thể chia sẻ niềm vui và sự sáng tạo.</p>
-    <button onclick="alert('Chào mừng bạn đến Chicken Gang!')">Tham gia ngay</button>
-  </section>
-  <section id="gallery">
-    <h2>Hình ảnh</h2>
-    <p>Album những chú gà đáng yêu sẽ được cập nhật tại đây 🐥</p>
-  </section>
-  <!-- Game section đặt đúng chỗ -->
-  <section id="game">
-    <h2>Game Bắn Vịt 🦆</h2>
-    <div id="scoreboard">Điểm: 0</div>
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
-  </section>
-  <section id="contact">
-    <h2>Liên hệ</h2>
-    <p>Email: chickengang@example.com</p>
-  </section>
-  <footer>
-    <p>&copy; 2026 Chicken Gang. All rights reserved.</p>
-  </footer>
-  <!-- Gọi file game.js -->
-  <script src="game.js"></script>
-</body>
-</html>
+  });
+
+  setInterval(createDuck, 1500);
+  update();
+</script>
