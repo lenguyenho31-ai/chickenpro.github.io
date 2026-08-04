@@ -69,11 +69,6 @@
       40% { transform: translateY(-20px); }
       60% { transform: translateY(-10px); }
     }
-    canvas {
-      display: block;
-      margin: auto;
-      border: 2px solid #333;
-    }
   </style>
 </head>
 <body>
@@ -84,7 +79,7 @@
   <nav>
     <a href="#about">Giới thiệu</a>
     <a href="#gallery">Hình ảnh</a>
-    <a href="#game">Game</a>
+    <a href="game.html" target="_blank">Game</a>
     <a href="#contact">Liên hệ</a>
   </nav>
   <section id="about">
@@ -96,12 +91,6 @@
     <h2>Hình ảnh</h2>
     <p>Album những chú gà đáng yêu sẽ được cập nhật tại đây 🐥</p>
   </section>
-  <!-- Game section -->
-  <section id="game">
-    <h2>Game Bắn Vịt 🦆</h2>
-    <div id="scoreboard">Điểm: 0</div>
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
-  </section>
   <section id="contact">
     <h2>Liên hệ</h2>
     <p>Email: chickengang@example.com</p>
@@ -109,81 +98,5 @@
   <footer>
     <p>&copy; 2026 Chicken Gang</p>
   </footer>
-
-  <!-- Script game -->
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-
-    let ducks = [];
-    let score = 0;
-
-    // Tạo vịt đứng yên, tự biến mất sau 4 giây
-    function createDuck() {
-      const x = Math.random() * (canvas.width - 50);
-      const y = Math.random() * (canvas.height - 50);
-      ducks.push({ x: x, y: y, createdAt: Date.now() });
-    }
-
-    function drawDuck(duck) {
-      ctx.font = "50px Segoe UI Emoji";
-      ctx.fillText("🦆", duck.x, duck.y);
-
-      // Nếu emoji không hiển thị, dùng hình tròn vàng:
-      // ctx.beginPath();
-      // ctx.arc(duck.x, duck.y, 20, 0, Math.PI * 2);
-      // ctx.fillStyle = "yellow";
-      // ctx.fill();
-      // ctx.stroke();
-    }
-
-    function drawScore() {
-      ctx.fillStyle = "rgba(0,0,0,0.5)";
-      ctx.fillRect(5, 5, 120, 30);
-      ctx.fillStyle = "white";
-      ctx.font = "20px Arial";
-      ctx.fillText("Điểm: " + score, 15, 27);
-    }
-
-    function update() {
-      // Vẽ nền xanh neon nhạt
-      ctx.fillStyle = "#aaffcc";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ducks.forEach((duck, index) => {
-        if (Date.now() - duck.createdAt > 4000) { // sống 4 giây
-          ducks.splice(index, 1);
-        } else {
-          drawDuck(duck);
-        }
-      });
-
-      drawScore();
-      requestAnimationFrame(update);
-    }
-
-    canvas.addEventListener("mousedown", (e) => {
-      if (e.button === 0) {
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        ducks.forEach((duck, index) => {
-          const dx = mouseX - duck.x;
-          const dy = mouseY - duck.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 25) {
-            ducks.splice(index, 1);
-            score++;
-            document.getElementById("scoreboard").textContent = "Điểm: " + score;
-          }
-        });
-      }
-    });
-
-    setInterval(createDuck, 1500);
-    update();
-  </script>
 </body>
 </html>
