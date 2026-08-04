@@ -31,7 +31,7 @@
     }
     canvas {
       display: block;
-      background: #aaffcc; /* xanh neon nhạt */
+      background: #F0F0F0;
     }
     @keyframes bounce {
       0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
@@ -76,7 +76,6 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    // Canvas full màn hình
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -129,7 +128,7 @@
 
       if (duck) {
         if (Date.now() - duck.createdAt > 4000) {
-          duck = null; // hết hạn
+          duck = null; // hết hạn, vòng lặp sẽ spawn ngay con mới
         } else {
           drawDuck(duck);
         }
@@ -152,10 +151,9 @@
 
         if (distance < 30) {
           explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
-          duck = null; // xoá vịt cũ
+          duck = null; // xoá vịt cũ, vòng lặp sẽ spawn ngay con mới
           score++;
           document.getElementById("scoreboard").textContent = "Điểm: " + score;
-          // con mới sẽ được tạo ngay trong vòng lặp update()
         }
       }
     });
