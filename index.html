@@ -84,7 +84,8 @@
   <section id="about">
     <h2>Giới thiệu</h2>
     <p>Chicken Gang là cộng đồng yêu thích gà, nơi bạn có thể chia sẻ niềm vui và sự sáng tạo.</p>
-    <button onclick="alert('Chào mừng bạn đến Chicken Gang!')">Tham gia ngay</button>
+    <!-- Nút tham gia sẽ chuyển hướng sang Discord -->
+    <button onclick="joinDiscord()">Tham gia ngay</button>
   </section>
   <section id="gallery">
     <h2>Hình ảnh</h2>
@@ -97,5 +98,12 @@
   <footer>
     <p>&copy; 2026 Chicken Gang</p>
   </footer>
+
+  <script>
+    function joinDiscord() {
+      // Thay bằng invite link thật của server bạn
+      window.location.href = "https://discord.gg/abc123";
+    }
+  </script>
 </body>
 </html>
