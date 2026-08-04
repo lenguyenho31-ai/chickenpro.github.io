@@ -9,7 +9,7 @@
       padding: 0;
       font-family: 'Roboto', sans-serif;
       text-align: center;
-      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      background: #FFFFFF; /* nền trắng */
       overflow: hidden;
     }
     h1 {
@@ -31,7 +31,7 @@
     }
     canvas {
       display: block;
-      background: #F0F0F0;
+      background: #FFFFFF; /* canvas trắng */
     }
     @keyframes bounce {
       0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
@@ -75,23 +75,32 @@
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    const duckImg = new Image();
+    duckImg.src = "duck.png"; // ảnh vịt nền trong suốt
+
     let duck = null;
     let score = 0;
-    let explosions = [];
 
     function createDuck() {
-      const x = Math.random() * (canvas.width - 50);
-      const y = Math.random() * (canvas.height - 50);
-      duck = { x: x, y: y, createdAt: Date.now() };
+      const x = Math.random() * (canvas.width - 120);
+      const y = Math.random() * (canvas.height - 120);
+      duck = { x, y, createdAt: Date.now(), hit: false };
     }
 
     function drawDuck(d) {
-      ctx.font = "100px Segoe UI Emoji"; // chỉnh kích thước emoji
-      ctx.fillText("🦆", d.x, d.y + 80); // dịch xuống để cân đối
+      if (d.hit) {
+        // animation khi bị bắn: rung nhẹ
+        const offset = Math.sin(Date.now() / 50) * 10;
+        ctx.save();
+        ctx.translate(d.x + offset, d.y);
+        ctx.drawImage(duckImg, 0, 0, 120, 120);
+        ctx.restore();
+      } else {
+        ctx.drawImage(duckImg, d.x, d.y, 120, 120);
+      }
     }
 
     function drawScore() {
@@ -102,57 +111,46 @@
       ctx.fillText("Điểm: " + score, 15, 27);
     }
 
-    function drawExplosion(explosion) {
-      const progress = (Date.now() - explosion.start) / 500;
-      if (progress < 1) {
-        ctx.beginPath();
-        ctx.arc(explosion.x, explosion.y, 20 + progress * 30, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,0,0,${1 - progress})`;
-        ctx.fill();
-      } else {
-        explosions.splice(explosions.indexOf(explosion), 1);
-      }
-    }
-
     function update() {
-      ctx.fillStyle = "#aaffcc";
+      ctx.fillStyle = "#FFFFFF"; // nền trắng
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      if (!duck) {
-        createDuck();
-      }
+      if (!duck) createDuck();
 
       if (duck) {
-        if (Date.now() - duck.createdAt > 4000) {
+        if (Date.now() - duck.createdAt > 4000 && !duck.hit) {
           duck = null;
         } else {
           drawDuck(duck);
         }
       }
 
-      explosions.forEach(explosion => drawExplosion(explosion));
       drawScore();
       requestAnimationFrame(update);
     }
-canvas.addEventListener("mousedown", (e) => {
-  if (e.button === 0 && duck) {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
 
-    const dx = mouseX - duck.x;
-    const dy = mouseY - duck.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    canvas.addEventListener("mousedown", (e) => {
+      if (e.button === 0 && duck) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
 
- if (distance < 80) { // tăng hitbox lên 80px cho vịt 100px
-   explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
-   score++;
-   document.getElementById("scoreboard").textContent = "Điểm: " + score;
-   createDuck(); // spawn ngay vịt mới 
- }  
-}
-});
-    
+        if (
+          mouseX > duck.x &&
+          mouseX < duck.x + 120 &&
+          mouseY > duck.y &&
+          mouseY < duck.y + 120
+        ) {
+          duck.hit = true;
+          score++;
+          document.getElementById("scoreboard").textContent = "Điểm: " + score;
+          setTimeout(() => {
+            duck = null;
+            createDuck();
+          }, 400); // animation rung 0.4s
+        }
+      }
+    });
 
     update();
 
