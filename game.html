@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chicken Gang - Game Bắn Vịt</title>
+  <style>
+    canvas {
+      display: block;
+      margin: auto;
+      background: #87CEEB; /* nền trời */
+      border: 2px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center;">🐔 Chicken Gang - Game Bắn Vịt 🦆</h1>
+  <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let ducks = [];
+    let score = 0;
+
+    // Tạo vịt bay ngẫu nhiên
+    function createDuck() {
+      const y = Math.random() * (canvas.height - 50);
+      ducks.push({ x: 0, y: y, speed: 2 + Math.random() * 3 });
+    }
+
+    // Vẽ vịt bằng emoji 🦆
+    function drawDuck(duck) {
+      ctx.font = "30px Arial"; // chỉnh kích thước emoji
+      ctx.fillText("🦆", duck.x, duck.y);
+    }
+
+    // Cập nhật game
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ducks.forEach((duck, index) => {
+        duck.x += duck.speed;
+        drawDuck(duck);
+
+        // Nếu vịt bay ra ngoài màn hình
+        if (duck.x > canvas.width) {
+          ducks.splice(index, 1);
+        }
+      });
+
+      function drawScore() {
+  ctx.fillStyle = "rgba(0,0,0,0.5)";
+  ctx.fillRect(5, 5, 120, 30); // nền mờ
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("Điểm: " + score, 15, 27);
+}
+      requestAnimationFrame(update);
+    }
+
+    // Bắn vịt khi click chuột trái
+    canvas.addEventListener("mousedown", (e) => {
+      if (e.button === 0) { // chỉ chuột trái
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        ducks.forEach((duck, index) => {
+          const dx = mouseX - duck.x;
+          const dy = mouseY - duck.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 20) {
+            ducks.splice(index, 1);
+            score++;
+          }
+        });
+      }
+    });
+
+    // Tạo vịt liên tục
+    setInterval(createDuck, 1500);
+
+    update();
+  </script>
+</body>
+</html>
