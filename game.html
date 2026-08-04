@@ -4,17 +4,58 @@
   <meta charset="UTF-8">
   <title>Chicken Gang - Game Bắn Vịt</title>
   <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    }
+    h1 {
+      margin: 20px;
+      color: #ff6f61;
+      font-family: 'Fredoka One', cursive;
+      animation: bounce 2s infinite;
+    }
+    #scoreboard {
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+      margin: 10px;
+    }
     canvas {
       display: block;
       margin: auto;
       background: #87CEEB; /* nền trời */
       border: 2px solid #333;
     }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-20px); }
+      60% { transform: translateY(-10px); }
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #ff6f61;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: transform 0.3s, background-color 0.3s;
+      margin-top: 15px;
+    }
+    button:hover {
+      transform: scale(1.1);
+      background-color: #e85c50;
+    }
   </style>
 </head>
 <body>
-  <h1 style="text-align:center;">🐔 Chicken Gang - Game Bắn Vịt 🦆</h1>
+  <h1>🐔 Chicken Gang - Game Bắn Vịt 🦆</h1>
+  <div id="scoreboard">Điểm: 0</div>
   <canvas id="gameCanvas" width="800" height="500"></canvas>
+  <button onclick="window.location.href='index.html'">⬅️ Quay lại Trang Chủ</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
@@ -31,8 +72,17 @@
 
     // Vẽ vịt bằng emoji 🦆
     function drawDuck(duck) {
-      ctx.font = "30px Arial"; // chỉnh kích thước emoji
+      ctx.font = "30px Arial";
       ctx.fillText("🦆", duck.x, duck.y);
+    }
+
+    // Vẽ điểm số
+    function drawScore() {
+      ctx.fillStyle = "rgba(0,0,0,0.5)";
+      ctx.fillRect(5, 5, 120, 30);
+      ctx.fillStyle = "white";
+      ctx.font = "20px Arial";
+      ctx.fillText("Điểm: " + score, 15, 27);
     }
 
     // Cập nhật game
@@ -42,26 +92,18 @@
       ducks.forEach((duck, index) => {
         duck.x += duck.speed;
         drawDuck(duck);
-
-        // Nếu vịt bay ra ngoài màn hình
         if (duck.x > canvas.width) {
           ducks.splice(index, 1);
         }
       });
 
-      function drawScore() {
-  ctx.fillStyle = "rgba(0,0,0,0.5)";
-  ctx.fillRect(5, 5, 120, 30); // nền mờ
-  ctx.fillStyle = "white";
-  ctx.font = "20px Arial";
-  ctx.fillText("Điểm: " + score, 15, 27);
-}
+      drawScore();
       requestAnimationFrame(update);
     }
 
     // Bắn vịt khi click chuột trái
     canvas.addEventListener("mousedown", (e) => {
-      if (e.button === 0) { // chỉ chuột trái
+      if (e.button === 0) {
         const rect = canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
@@ -74,6 +116,7 @@
           if (distance < 20) {
             ducks.splice(index, 1);
             score++;
+            document.getElementById("scoreboard").textContent = "Điểm: " + score;
           }
         });
       }
