@@ -54,9 +54,8 @@
 <body>
   <h1>🐔 Chicken Gang - Game Bắn Vịt 🦆</h1>
   <div id="scoreboard">Điểm: 0</div>
-  <canvas id="gameCanvas" width="800" height="500"></canvas>
+  <canvas id="gameCanvas" width="500" height="350"></canvas>
 
-  <!-- Các nút điều hướng -->
   <button onclick="saveGame()">💾 Lưu điểm</button>
   <button onclick="window.open('leaderboard.html','_blank')">🏆 Xem Bảng Xếp Hạng</button>
   <button onclick="window.open('index.html','_blank')">⬅️ Quay lại Trang Chủ</button>
@@ -65,20 +64,20 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    let ducks = [];
+    let duck = null;
     let score = 0;
     let explosions = [];
 
-    // Tạo vịt đứng yên, tự biến mất sau 4s
+    // Tạo duy nhất 1 con vịt
     function createDuck() {
       const x = Math.random() * (canvas.width - 50);
       const y = Math.random() * (canvas.height - 50);
-      ducks.push({ x: x, y: y, createdAt: Date.now() });
+      duck = { x: x, y: y, createdAt: Date.now() };
     }
 
-    function drawDuck(duck) {
+    function drawDuck(d) {
       ctx.font = "40px Segoe UI Emoji";
-      ctx.fillText("🦆", duck.x, duck.y);
+      ctx.fillText("🦆", d.x, d.y);
     }
 
     function drawScore() {
@@ -89,9 +88,8 @@
       ctx.fillText("Điểm: " + score, 15, 27);
     }
 
-    // Vẽ hiệu ứng nổ khi vịt bị bắn
     function drawExplosion(explosion) {
-      const progress = (Date.now() - explosion.start) / 500; // 0.5s
+      const progress = (Date.now() - explosion.start) / 500;
       if (progress < 1) {
         ctx.beginPath();
         ctx.arc(explosion.x, explosion.y, 20 + progress * 30, 0, Math.PI * 2);
@@ -106,46 +104,44 @@
       ctx.fillStyle = "#aaffcc";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ducks.forEach((duck, index) => {
+      if (duck) {
         if (Date.now() - duck.createdAt > 4000) {
-          ducks.splice(index, 1);
+          duck = null;
         } else {
           drawDuck(duck);
         }
-      });
+      }
 
       explosions.forEach(explosion => drawExplosion(explosion));
-
       drawScore();
       requestAnimationFrame(update);
     }
 
     canvas.addEventListener("mousedown", (e) => {
-      if (e.button === 0) {
+      if (e.button === 0 && duck) {
         const rect = canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
-        ducks.forEach((duck, index) => {
-          const dx = mouseX - duck.x;
-          const dy = mouseY - duck.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+        const dx = mouseX - duck.x;
+        const dy = mouseY - duck.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < 25) {
-            // Tạo hiệu ứng nổ
-            explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
-            ducks.splice(index, 1);
-            score++;
-            document.getElementById("scoreboard").textContent = "Điểm: " + score;
-          }
-        });
+        if (distance < 25) {
+          explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
+          duck = null;
+          score++;
+          document.getElementById("scoreboard").textContent = "Điểm: " + score;
+        }
       }
     });
 
-    setInterval(createDuck, 1500);
+    setInterval(() => {
+      if (!duck) createDuck();
+    }, 1500);
+
     update();
 
-    // Lưu điểm vào localStorage
     function saveGame() {
       let playerName = prompt("Nhập tên của bạn:");
       if (!playerName) playerName = "Người chơi";
