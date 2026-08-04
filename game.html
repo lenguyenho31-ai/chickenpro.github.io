@@ -81,7 +81,7 @@
     canvas.height = window.innerHeight;
 
     const duckImg = new Image();
-    duckImg.src = "duck.webp"; // hoặc duck.png nếu bạn dùng PNG
+    duckImg.src = "duck.webp"; // hoặc "duck.png" nếu bạn dùng PNG
 
     let duck = null;
     let score = 0;
@@ -120,7 +120,7 @@
 
       if (duck) {
         if (Date.now() - duck.createdAt > 4000 && !duck.hit) {
-          duck = null;
+          createDuck(); // spawn vịt mới ngay, không delay
         } else {
           drawDuck(duck);
         }
@@ -145,10 +145,9 @@
           duck.hit = true;
           score++;
           document.getElementById("scoreboard").textContent = "Điểm: " + score;
-          setTimeout(() => {
-            duck = null;
-            createDuck();
-          }, 400);
+
+          // tạo vịt mới ngay, không chờ 400ms
+          createDuck();
         }
       }
     });
