@@ -145,11 +145,12 @@
         const dy = mouseY - duck.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < 30) {
+        if (distance < 40) { // hitbox rộng hơn
           explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
-          duck = null;
           score++;
           document.getElementById("scoreboard").textContent = "Điểm: " + score;
+          // spawn ngay vịt mới
+          createDuck();
         }
       }
     });
