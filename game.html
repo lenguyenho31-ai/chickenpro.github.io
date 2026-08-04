@@ -31,7 +31,7 @@
     }
     canvas {
       display: block;
-      background: #F0F0F0;
+      background: #aaffcc;
     }
     @keyframes bounce {
       0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
@@ -90,11 +90,8 @@
     }
 
     function drawDuck(d) {
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, 20, 0, Math.PI * 2);
-      ctx.fillStyle = "yellow";
-      ctx.fill();
-      ctx.stroke();
+      ctx.font = "40px Segoe UI Emoji";
+      ctx.fillText("🦆", d.x, d.y);
     }
 
     function drawScore() {
@@ -121,14 +118,13 @@
       ctx.fillStyle = "#aaffcc";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Nếu chưa có vịt thì tạo ngay
       if (!duck) {
         createDuck();
       }
 
       if (duck) {
         if (Date.now() - duck.createdAt > 4000) {
-          duck = null; // hết hạn, vòng lặp sẽ spawn ngay con mới
+          duck = null;
         } else {
           drawDuck(duck);
         }
@@ -151,7 +147,7 @@
 
         if (distance < 30) {
           explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
-          duck = null; // xoá vịt cũ, vòng lặp sẽ spawn ngay con mới
+          duck = null;
           score++;
           document.getElementById("scoreboard").textContent = "Điểm: " + score;
         }
@@ -175,4 +171,3 @@
     });
   </script>
 </body>
-</html>
