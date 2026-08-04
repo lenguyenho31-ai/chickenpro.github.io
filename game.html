@@ -90,8 +90,8 @@
     }
 
     function drawDuck(d) {
-      ctx.font = "100px Segoe UI Emoji";
-      ctx.fillText("🦆", d.x, d.y);
+      ctx.font = "100px Segoe UI Emoji"; // chỉnh kích thước emoji
+      ctx.fillText("🦆", d.x, d.y + 80); // dịch xuống để cân đối
     }
 
     function drawScore() {
@@ -144,14 +144,13 @@ canvas.addEventListener("mousedown", (e) => {
     const dy = mouseY - duck.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance < 50) { // tăng hitbox lên 50
-      explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
-      score++;
-      document.getElementById("scoreboard").textContent = "Điểm: " + score;
-      // spawn ngay vịt mới
-      createDuck();
-    }
-  }
+ if (distance < 80) { // tăng hitbox lên 80px cho vịt 100px
+   explosions.push({ x: duck.x, y: duck.y, start: Date.now() });
+   score++;
+   document.getElementById("scoreboard").textContent = "Điểm: " + score;
+   createDuck(); // spawn ngay vịt mới 
+ }  
+}
 });
     
 
